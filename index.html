@@ -1,41 +1,55 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Slot Overlay</title>
+  <title>Twitch Slot Overlay</title>
   <style>
     body {
       margin: 0;
-      padding: 20px;
-      font-family: sans-serif;
-      background-color: transparent;
+      padding: 0;
+      background: transparent;
       color: white;
-      font-size: 36px;
+      font-family: Arial, sans-serif;
+      font-size: 24px;
     }
-    .slot {
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
       margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div id="slotlist">Warte auf Slot-Daten...</div>
+  <ul id="slot-queue"></ul>
 
   <script>
-    async function fetchSlots() {
+    async function fetchSlotQueue() {
       try {
-        const res = await fetch('https://twitch-slot-api.onrender.com/slots.json');
-        const slots = await res.json();
-        const container = document.getElementById("slotlist");
-        container.innerHTML = slots.map((s, i) => `<div class="slot">${i + 1}. ${s}</div>`).join('');
-      } catch (err) {
-        document.getElementById("slotlist").innerText = "Fehler beim Laden der Slots";
+        const response = await fetch("https://twitch-slot-api.onrender.com/queue");
+        const data = await response.json();
+
+        const container = document.getElementById("slot-queue");
+        container.innerHTML = "";
+
+        if (data.length === 0) {
+          container.innerHTML = "<li>Keine Wünsche in der Liste</li>";
+        } else {
+          data.forEach((item, index) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `${index + 1}. ${item.name} – ${item.request}`;
+            container.appendChild(listItem);
+          });
+        }
+      } catch (error) {
+        console.error("Fehler beim Laden der Slot-Liste:", error);
       }
     }
 
-    fetchSlots();
-    setInterval(fetchSlots, 5000); // alle 5 Sekunden aktualisieren
+    fetchSlotQueue();
+    setInterval(fetchSlotQueue, 10000);
   </script>
 </body>
 </html>
