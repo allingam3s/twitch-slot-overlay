@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Slot Overlay</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: sans-serif;
+      background-color: transparent;
+      color: white;
+      font-size: 36px;
+    }
+    .slot {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="slotlist">Warte auf Slot-Daten...</div>
+
+  <script>
+    async function fetchSlots() {
+      try {
+        const res = await fetch('https://twitch-slot-api.onrender.com/slots.json');
+        const slots = await res.json();
+        const container = document.getElementById("slotlist");
+        container.innerHTML = slots.map((s, i) => `<div class="slot">${i + 1}. ${s}</div>`).join('');
+      } catch (err) {
+        document.getElementById("slotlist").innerText = "Fehler beim Laden der Slots";
+      }
+    }
+
+    fetchSlots();
+    setInterval(fetchSlots, 5000); // alle 5 Sekunden aktualisieren
+  </script>
+</body>
+</html>
